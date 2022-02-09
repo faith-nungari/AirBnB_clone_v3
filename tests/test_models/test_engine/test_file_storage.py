@@ -115,27 +115,27 @@ class TestFileStorage(unittest.TestCase):
         self.assertEqual(json.loads(string), json.loads(js))
         
         @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+
     def test_get(self):
-        """ Tests method for obtaining an instance file storage"""
-        storage = FileStorage()
-        dic = {"name": "Vecindad"}
-        instance = State(**dic)
-        storage.new(instance)
-        storage.save()
-        storage = FileStorage()
-        get_instance = storage.get(State, instance.id)
-        self.assertEqual(get_instance, instance)
-        
-        @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+        '''
+            Test if get method retrieves obj requested
+        '''
+        new_state = State(name="NewYork")
+        storage.new(new_state)
+        key = "State.{}".format(new_state.id)
+        result = storage.get("State", new_state.id)
+        self.assertTrue(result.id, new_state.id)
+        self.assertIsInstance(result, State)
+
     def test_count(self):
-        """ Tests count method file storage """
-        storage = FileStorage()
-        dic = {"name": "Vecindad"}
-        state = State(**dic)
-        storage.new(state)
-        dic = {"name": "Mexico"}
-        city = City(**dic)
-        storage.new(city)
-        storage.save()
-        c = storage.count()
-        self.assertEqual(len(storage.all()), c)
+        '''
+            Test if count method returns expected number of objects
+        '''
+        old_count = storage.count("State")
+        new_state1 = State(name="NewYork")
+        storage.new(new_state1)
+        new_state2 = State(name="Virginia")
+        storage.new(new_state2)
+        new_state3 = State(name="California")
+        storage.new(new_state3)
+        self.assertEqual(old_count + 3, storage.count("State"))
